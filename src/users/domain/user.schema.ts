@@ -1,8 +1,12 @@
-import { varchar, timestamp } from "drizzle-orm/pg-core";
-import { pgTable, pgEnum } from "drizzle-orm/pg-core";
+import { MemberSchema } from "../../members/domain/member.schema";
+import { relations } from "drizzle-orm";
 import {createId} from "@paralleldrive/cuid2";
+import { pgTable, pgEnum } from "drizzle-orm/pg-core";
+import { varchar, timestamp } from "drizzle-orm/pg-core";
+
 
 const RoleEnum = pgEnum("role", ["USER", "SUPPORT"]);
+
 const InstitutionEnum = pgEnum("institution", [
     "UFPA",
     "UEPA",
@@ -26,3 +30,7 @@ export const userSchema = pgTable("users", {
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow().$default(() => new Date())
 });
+
+export const userRelations = relations(userSchema, ({ many }) => ({
+    memberships: many(MemberSchema)
+}));

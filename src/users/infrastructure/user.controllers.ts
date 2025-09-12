@@ -64,7 +64,6 @@ export const userRoutes = new Elysia({
         const user = await userRegister({...body});
         
         set.status = 201;
-        
         return { 
             status : 201,
             user : user
