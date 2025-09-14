@@ -1,6 +1,7 @@
 import { database } from "@/database/connection";
 import { userSchema } from "../domain/user.schema";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
+import { TeamSchema, User2TeamsSchema } from "@/database/index.schema";
 
 
 interface UserData{
@@ -65,6 +66,55 @@ export class UserRepository {
         .where(eq(userSchema.id, id))
         .returning();
         return updatedUser;
+    }
+
+    static async profileuser(id: string) {
+        // Buscar o usuário
+        const [user] = await database
+        .select({
+            id: userSchema.id,
+            firstName: userSchema.firstName,
+            lastName: userSchema.lastName,
+            email: userSchema.email,
+            role: userSchema.role,
+            instituition: userSchema.instituition,
+            createdAt: userSchema.createdAt,
+            updatedAt: userSchema.updatedAt
+        })
+        .from(userSchema)
+        .where(eq(userSchema.id, id))
+        .limit(1);
+
+        if (!user) {
+            return null;
+        }
+
+        // Buscar os teams do usuário com JOIN otimizado
+        const userTeams = await database
+        .select({
+            teamId: User2TeamsSchema.teamId,
+            role: User2TeamsSchema.role,
+            joinedAt: User2TeamsSchema.joinedAt,
+            teamName: TeamSchema.name,
+            teamDescription: TeamSchema.description
+        })
+        .from(User2TeamsSchema)
+        .innerJoin(TeamSchema, eq(User2TeamsSchema.teamId, TeamSchema.id))
+        .where(eq(User2TeamsSchema.userId, id));
+
+        // Formatar os teams
+        const teams = userTeams.map(userTeam => ({
+            id: userTeam.teamId,
+            name: userTeam.teamName,
+            description: userTeam.teamDescription,
+            role: userTeam.role,
+            joinedAt: userTeam.joinedAt
+        }));
+
+        return {
+            ...user,
+            teams
+        };
     }
 
 }
