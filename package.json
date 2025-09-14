@@ -4,9 +4,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "migrate:generate": "drizzle-kit generate:pg --out migrations --schema src/users/domain/user.schema.ts",
-    "migrate:push": "drizzle-kit push:pg --schema src/database/schema.ts",
-    "migrate:apply": "drizzle-kit up:pg --schema src/database/schema.ts"
+    "migrate:generate": "drizzle-kit generate --config src/database/schema.ts",
+    "migrate:push": "drizzle-kit push --config src/database/schema.ts",
+    "migrate:apply": "drizzle-kit migrate --config src/database/schema.ts"
   },
   "dependencies": {
     "@paralleldrive/cuid2": "^2.2.2",

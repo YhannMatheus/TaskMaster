@@ -1,7 +1,7 @@
 import { Static, t } from "elysia"
 
 export const UserType = t.Object({
-    id: t.String(),
+    id: t.Nullable(t.String()),
     firstName: t.String(),
     lastName: t.Nullable(t.String()),
     email: t.String().defaults(""),

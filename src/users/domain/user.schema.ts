@@ -1,4 +1,4 @@
-import { MemberSchema } from "../../members/domain/member.schema";
+import { User2TeamsSchema } from "@/database/schemas/user-teams.schema";
 import { relations } from "drizzle-orm";
 import {createId} from "@paralleldrive/cuid2";
 import { pgTable, pgEnum } from "drizzle-orm/pg-core";
@@ -32,5 +32,5 @@ export const userSchema = pgTable("users", {
 });
 
 export const userRelations = relations(userSchema, ({ many }) => ({
-    memberships: many(MemberSchema)
+    team : many(User2TeamsSchema)
 }));
