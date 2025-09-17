@@ -1,4 +1,4 @@
-import { Projectschema } from '@/projects/project.schema';
+import { Projectschema } from '@/projects/domain/project.schema';
 import { relations } from "drizzle-orm";
 import { pgTable } from "drizzle-orm/pg-core";
 import {createId} from "@paralleldrive/cuid2";

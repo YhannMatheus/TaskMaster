@@ -1,5 +1,12 @@
-import Elysia from "elysia";
+import { createApp } from './appFactory'
+import { env } from './core/env'
 
-export const app = new Elysia();
+const packageJson = JSON.parse(await Bun.file('./package.json').text())
 
-app.get("/", () => "Hello, TaskMaster!");
+const app = createApp()
+
+app.listen(env.PORT)
+
+export type app = typeof app
+
+console.log(`Server started on port ${env.PORT} - version ${packageJson.version}`)

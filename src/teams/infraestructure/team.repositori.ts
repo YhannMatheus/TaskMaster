@@ -8,12 +8,21 @@ interface TeamData{
 }
 
 export class TeamRepository {
-    static async create(data: TeamData) {
+    static async create(data: TeamData, userId: string) {
         const [team] = await database
         .insert(TeamSchema)
         .values(data)
         .returning();
-        return team;
+
+        const [member] = await database
+        .insert(User2TeamsSchema)
+        .values({
+            userId: userId,
+            teamId: team.id,
+            role: 'OWNER'
+        }).returning();
+
+        return {team, member};
     }
 
     static async findByName(name: string) {
@@ -41,6 +50,15 @@ export class TeamRepository {
         if (limit) query.limit(limit);
         if (offset) query.offset(offset);
         const teams = await query;
+        return teams;
+    }
+    
+    static async listAllByUser(userId: string){
+        const teams = await database
+        .select()
+        .from(TeamSchema)
+        .innerJoin(User2TeamsSchema, eq(TeamSchema.id, User2TeamsSchema.teamId))
+        .where(eq(User2TeamsSchema.userId, userId));
         return teams;
     }
 
