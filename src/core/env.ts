@@ -1,7 +1,19 @@
 import { z } from "zod";
 import dotenv from "dotenv";
 
-dotenv.config();
+let _envFile = null;
+
+try {
+    _envFile = await Bun.file('.env').text();
+} catch (err) {
+}
+
+if (_envFile) {
+    const parsed = dotenv.parse(_envFile);
+    for (const [k, v] of Object.entries(parsed)) {
+        if (process.env[k] === undefined) process.env[k] = String(v);
+    }
+}
 
 const envSchema = z.object({
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),

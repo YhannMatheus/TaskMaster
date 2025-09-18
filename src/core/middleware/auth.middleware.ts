@@ -11,15 +11,14 @@ interface AuthenticatedUser {
 // Plugin de autenticação que só executa quando 'authenticated' é acessado
 export const authMiddleware = new Elysia({ name: 'auth' })
     .derive(({ cookie, set }) => ({
-        get authenticated(): Promise<AuthenticatedUser> {
+        get authenticated(): Promise<AuthenticatedUser | null> {
             // Esta função só é executada quando 'authenticated' é acessado na rota
             return (async () => {
                 // Captura o token do cookie
                 const token = cookie.access_token?.value;
                 
                 if (!token) {
-                    set.status = 401;
-                    throw new UnauthorizedError();
+                    return null;
                 }
                 
                 try {

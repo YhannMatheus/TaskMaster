@@ -1,5 +1,6 @@
 import { UserType, UserProfileResponseType } from './../domain/user.type';
 import { Elysia, t } from "elysia"
+import { cookie } from '@elysiajs/cookie'
 import { userLogin } from './../application/login.usecase';
 import { userRegister } from "../application/register.usecase";
 import { 
@@ -11,6 +12,7 @@ import {
 } from '@/core/errors/index.error';
 import { userProfile } from '../application/profile.usecase';
 import { authMiddleware, AuthenticatedUser } from '@/core/middleware/auth.middleware';
+import { env } from '@/core/env';
 
 //TODO: Inicio dos controllers de usuário
 export const userRoutes = new Elysia({
@@ -18,10 +20,20 @@ export const userRoutes = new Elysia({
     tags: ["Users"]
 })
 .use(authMiddleware)
-.post("/auth/login", async ({body, set}) => {
+.use(cookie())
+.post("/auth/login", async ({body, set, cookie}) => {
     try{
         
         const userLoginData = await userLogin(body.email, body.password, body.rememberMe || false)
+        
+        cookie.access_token.set({
+            value: userLoginData.token,
+            httpOnly: true,
+            secure: (env.NODE_ENV === "production") ? true : false,
+            sameSite: 'lax',
+            maxAge: body.rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24,
+            path: '/'
+        });
         
         set.status = 200;
         return {
@@ -64,14 +76,24 @@ export const userRoutes = new Elysia({
     }
 })
 
-.post("/register", async ({body, set}) => {
+.post("/register", async ({body, set, cookie}) => {
     try {
-        const { user } = await userRegister({ ...body });
+        const { user , token} = await userRegister({ ...body });
 
+        cookie.access_token.set({
+            value: token,
+            httpOnly: true,
+            secure: (env.NODE_ENV === "production") ? true : false,
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60,
+            path: '/'
+        });
+        
         set.status = 201;
+
         return {
             status: 201,
-            user: { ...user }
+            user: { ...user },
         };
 
     } catch (error) {
@@ -106,7 +128,8 @@ export const userRoutes = new Elysia({
     response : {
         201: t.Object({
             status: t.Number(),
-            user: t.Omit(UserType, ['password'])
+            user: t.Omit(UserType, ['password']),
+            token: t.String()
         }),
         400: t.Object({
             error: t.String()

@@ -1,10 +1,9 @@
-import Elysia from "elysia";
+import { Elysia } from "elysia";
 import { userRoutes } from "./users/infrastructure/user.controllers";
+import { TeamRoutes } from "./teams/infraestructure/team.controller";
 
-const routes = new Elysia({
-    prefix: "/taskmaster/api/v1",
-})
+const appRoutes = new Elysia()
 .use(userRoutes)
+.use(TeamRoutes);
 
-
-export { routes as AppRoutes }
+export const AppRoutes = appRoutes;

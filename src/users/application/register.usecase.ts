@@ -49,5 +49,5 @@ export const userRegister = async(register: RegisterResponse) => {
 
     const token = AuthService.generateToken({ userId: newUser.id, email: newUser.email});
 
-    return { user: newUser, token };
+    return { user: newUser, token: token };
 }

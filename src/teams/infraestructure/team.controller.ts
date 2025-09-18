@@ -1,3 +1,4 @@
+import { cookie } from './../../../node_modules/@elysiajs/cookie/src/index';
 import {Elysia, InternalServerError, t} from 'elysia'
 import { TeamRepository } from "./team.repositori";
 import { TeamType } from '../domain/team.type';
@@ -7,7 +8,7 @@ import {
 import { authMiddleware, AuthenticatedUser } from '@/core/middleware/auth.middleware';
 import { createTeam } from '../application/create-team.usecase';
 
-export const TeamController = new Elysia({
+export const TeamRoutes = new Elysia({
     prefix: '/teams',
     tags: ['Teams']
 })
@@ -16,7 +17,7 @@ export const TeamController = new Elysia({
 .post('/team', async(context: any) => {
     const { body, authenticated, set } = context;
     const user = authenticated as AuthenticatedUser;
-    if(user){
+    if(user.userId != null){
         try{
             const team = await createTeam(body, user.userId);
 

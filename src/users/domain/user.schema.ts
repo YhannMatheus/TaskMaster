@@ -32,5 +32,5 @@ export const userSchema = pgTable("users", {
 });
 
 export const userRelations = relations(userSchema, ({ many }) => ({
-    team : many(User2TeamsSchema)
+    teams: many(User2TeamsSchema)
 }));
