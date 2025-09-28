@@ -28,6 +28,16 @@ const envSchema = z.object({
     PORT: z.coerce.number().default(3000),
     HOST: z.string().min(1).default("localhost"),
 
+    // Email configuration
+    SMTP_HOST: z.string().default("smtp.gmail.com"),
+    SMTP_PORT: z.coerce.number().default(587),
+    SMTP_SECURE: z.string().default("false"),
+    SMTP_USER: z.string().default(""),
+    SMTP_PASSWORD: z.string().default(""),
+    
+    // Frontend URL
+    FRONTEND_URL: z.string().default("http://localhost:3000"),
+
 })
 
 export const env = envSchema.parse(process.env);

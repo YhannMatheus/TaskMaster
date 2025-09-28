@@ -6,6 +6,7 @@ EmailAlreadyUsedError,
 PasswordDoNotMatchError 
 } from "@/core/errors/index.error";
 import { AuthService, CryptService, ValidatorsService } from "@/core/services/index.service";
+import { SessionRepository } from "@/session/infraestructure/session.repository";
 
 interface RegisterResponse {
     firstName: string;
@@ -48,6 +49,13 @@ export const userRegister = async(register: RegisterResponse) => {
     });
 
     const token = AuthService.generateToken({ userId: newUser.id, email: newUser.email});
+    
+    await SessionRepository.createSession({
+        email: newUser.email,
+        token: token,
+        type: "email_verification",
+        expiresAt: new Date(Date.now() + 7*24*60*60*1000)
+    });
 
     return { user: newUser, token: token };
 }

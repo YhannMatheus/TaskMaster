@@ -1,5 +1,5 @@
 import { database } from "@/database/connection";
-import { userSchema } from "../domain/user.schema";
+import { UserSchema } from "../domain/user.schema";
 import { desc, eq } from "drizzle-orm";
 import { TeamSchema, User2TeamsSchema } from "@/database/index.schema";
 
@@ -20,17 +20,17 @@ interface UserData{
 export class UserRepository {
     static async createUser(userData : UserData) {
         const [newUser] = await database
-            .insert(userSchema)
-            .values(userData)
-            .returning();
+        .insert(UserSchema)
+        .values(userData)
+        .returning();
         return newUser;
     }
 
     static async findByEmail(email: string) {
         const [user] = await database
         .select()
-        .from(userSchema)
-        .where(eq(userSchema.email, email))
+        .from(UserSchema)
+        .where(eq(UserSchema.email, email))
         .limit(1);
         return user;
     }
@@ -38,8 +38,8 @@ export class UserRepository {
     static async findByid(id: string) {
         const [user] = await database
         .select()
-        .from(userSchema)
-        .where(eq(userSchema.id, id))
+        .from(UserSchema)
+        .where(eq(UserSchema.id, id))
         .limit(1);
         return user;
     }
@@ -47,7 +47,7 @@ export class UserRepository {
     static async findAllUsers(pg: number = 1, limit: number = 10) {
         const users = await database
         .select()
-        .from(userSchema)
+        .from(UserSchema)
         .offset((pg - 1) * limit)
         .limit(limit);
         return users;
@@ -55,15 +55,15 @@ export class UserRepository {
 
     static async deleteUser(id: string) {
         await database
-        .delete(userSchema)
-        .where(eq(userSchema.id, id));
+        .delete(UserSchema)
+        .where(eq(UserSchema.id, id));
     }
 
     static async updateUser(id: string, userData: Partial<UserData>) {
         const [updatedUser] = await database
-        .update(userSchema)
+        .update(UserSchema)
         .set(userData)
-        .where(eq(userSchema.id, id))
+        .where(eq(UserSchema.id, id))
         .returning();
         return updatedUser;
     }
@@ -72,17 +72,17 @@ export class UserRepository {
         // Buscar o usuário
         const [user] = await database
         .select({
-            id: userSchema.id,
-            firstName: userSchema.firstName,
-            lastName: userSchema.lastName,
-            email: userSchema.email,
-            role: userSchema.role,
-            instituition: userSchema.instituition,
-            createdAt: userSchema.createdAt,
-            updatedAt: userSchema.updatedAt
+            id: UserSchema.id,
+            firstName: UserSchema.firstName,
+            lastName: UserSchema.lastName,
+            email: UserSchema.email,
+            role: UserSchema.role,
+            instituition: UserSchema.instituition,
+            createdAt: UserSchema.createdAt,
+            updatedAt: UserSchema.updatedAt
         })
-        .from(userSchema)
-        .where(eq(userSchema.id, id))
+        .from(UserSchema)
+        .where(eq(UserSchema.id, id))
         .limit(1);
 
         if (!user) {

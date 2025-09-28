@@ -1,4 +1,4 @@
-import { UserType, UserProfileResponseType } from './../domain/user.type';
+import { UserType } from './../domain/user.type';
 import { Elysia, t } from "elysia"
 import { cookie } from '@elysiajs/cookie'
 import { userLogin } from './../application/login.usecase';
@@ -11,7 +11,7 @@ import {
     UnauthorizedError
 } from '@/core/errors/index.error';
 import { userProfile } from '../application/profile.usecase';
-import { authMiddleware, AuthenticatedUser } from '@/core/middleware/auth.middleware';
+import { authMiddleware } from '@/core/middleware/auth.middleware';
 import { env } from '@/core/env';
 
 //TODO: Inicio dos controllers de usuário

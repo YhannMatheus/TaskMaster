@@ -122,7 +122,19 @@ export class TeamRepository {
         return member.length > 0;
     }
 
-    static async removeMemberWithConfirmation(userId: string, teamId: string) {
+    static async getMember(userId: string, teamId: string) {
+        const [member] = await database
+        .select()
+        .from(User2TeamsSchema)
+        .where(and(
+            eq(User2TeamsSchema.userId, userId),
+            eq(User2TeamsSchema.teamId, teamId)
+        ))
+        .limit(1);
+        return member;
+    }
+
+    static async removeMember(userId: string, teamId: string) {
         const result = await database
         .delete(User2TeamsSchema)
         .where(and(

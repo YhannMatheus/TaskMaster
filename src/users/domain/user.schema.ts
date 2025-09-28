@@ -19,7 +19,7 @@ const InstitutionEnum = pgEnum("institution", [
     "NENHUMA"
 ]);
 
-export const userSchema = pgTable("users", {
+export const UserSchema = pgTable("users", {
     id :varchar("id", {length: 255}).$default(() => createId()).primaryKey(),
     firstName: varchar("first_name", {length: 255}).notNull(),
     lastName: varchar("last_name", {length: 255}),
@@ -28,9 +28,10 @@ export const userSchema = pgTable("users", {
     role: RoleEnum('role').default('USER').notNull(),
     instituition: InstitutionEnum('institution').default('NENHUMA'),
     createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow().$default(() => new Date())
+    updatedAt: timestamp("updated_at").defaultNow().$default(() => new Date()),
+    verificationDate: timestamp("verification_date"),
 });
 
-export const userRelations = relations(userSchema, ({ many }) => ({
+export const userRelations = relations(UserSchema, ({ many }) => ({
     teams: many(User2TeamsSchema)
 }));

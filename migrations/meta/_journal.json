@@ -8,6 +8,20 @@
       "when": 1758060189650,
       "tag": "0000_thick_ogun",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1758209088581,
+      "tag": "0001_lovely_jack_flag",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1758220420336,
+      "tag": "0002_motionless_xorn",
+      "breakpoints": true
     }
   ]
 }
