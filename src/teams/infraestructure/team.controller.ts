@@ -1,7 +1,5 @@
-import { cookie } from './../../../node_modules/@elysiajs/cookie/src/index';
 import {Elysia, InternalServerError, t} from 'elysia'
 import { TeamRepository } from "./team.repositori";
-import { TeamType } from '../domain/team.type';
 import {
     UnauthorizedError
 } from "@/core/errors/index.error"
@@ -47,7 +45,7 @@ export const TeamRoutes = new Elysia({
             set.status = 500;
             return {
                 status: "500",
-                message: 'Internal server error'
+                message: 'Erro interno do servidor'
             }
         }
     }

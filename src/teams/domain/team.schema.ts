@@ -13,7 +13,7 @@ export const TeamSchema = pgTable("team",{
     updatedAt: timestamp("updated_at").defaultNow().$default(() => new Date())
 })
 
-export const TeamRelations = relations(TeamSchema, ({ many, one }) => ({
+export const TeamRelations = relations(TeamSchema, ({ many }) => ({
     members: many(User2TeamsSchema),
     projects: many(ProjectSchema)
 }));

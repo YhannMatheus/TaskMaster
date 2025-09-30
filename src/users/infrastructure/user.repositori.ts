@@ -1,6 +1,6 @@
 import { database } from "@/database/connection";
 import { UserSchema } from "../domain/user.schema";
-import { desc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { TeamSchema, User2TeamsSchema } from "@/database/index.schema";
 
 

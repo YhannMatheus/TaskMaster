@@ -6,6 +6,10 @@ let _envFile = null;
 try {
     _envFile = await Bun.file('.env').text();
 } catch (err) {
+    // ignorar se o arquivo .env não existir no ambiente
+    // eslint-disable-next-line no-console
+    console.debug('.env not found or unreadable');
+
 }
 
 if (_envFile) {

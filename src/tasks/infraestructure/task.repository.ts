@@ -15,7 +15,7 @@ export interface Task {
     dueDate: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
-};
+}
 
 export class TaskRepository {
     static async createTask(task: Task): Promise<Task> {
@@ -24,6 +24,26 @@ export class TaskRepository {
         .values({...task})
         .returning();
         return taskData;
+    }
+
+    static async updateTask(task: Task): Promise<Task | undefined> {
+        const [updatedTask] = await database
+        .update(TaskSchema)
+        .set({
+            title: task.title,
+            description: task.description,
+            projectId: task.projectId,
+            columnId: task.columnId,
+            inChargeUserId: task.inChargeUserId,
+            status: task.status,
+            priority: task.priority,
+            dueDate: task.dueDate,
+            updatedAt: new Date()
+        })
+        .where(eq(TaskSchema.id, task.id))
+        .returning();
+
+        return updatedTask;
     }
 
     static async modifyColumnTask(taskId: string, columnId: string): Promise<Task | undefined> {
@@ -87,7 +107,7 @@ export class TaskRepository {
         .where(eq(TaskSchema.id, taskId));
     }
 
-    static async listAllForProject( projectId: string, page: number, limit: number, search?: string, sortBy?: string, ) {
+    static async listAllForProject( projectId: string, page: number, limit: number) {
         const offset = (page - 1) * limit;
 
         const tasks = await database
@@ -105,6 +125,6 @@ export class TaskRepository {
         .limit(limit)
         .offset(offset);
 
-        return tasks ;
+        return tasks;
     }
 }

@@ -1,0 +1,8 @@
+[
+  {
+    "key": "ctrl+p",
+    "command": "workbench.action.tasks.runTask",
+    "args": "ESLint: fix",
+    "when": "editorTextFocus"
+  }
+]

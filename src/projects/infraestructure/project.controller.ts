@@ -10,22 +10,25 @@ export const ProjectController = new Elysia({
     tags: ["Projects"]
 })
 .use(authMiddleware)
-
 .post("/", async (context: any) => {
     const { body, authenticated, set } = context;
+
+    if (!authenticated) {
+        set.status = 401;
+        return { error: 'Não autorizado' };
+    }
 
     try {
         const project = await createProject(body);
         set.status = 201;
         return project;
-
     } catch (error) {
         if (error instanceof InvalidProjectDataError) {
             set.status = 400;
             return { error: error.message };
         }
         set.status = 500;
-        return { error: "Internal Server Error" };
+        return { error: "Erro interno do servidor" };
     }
 }, {
     body: t.Object({
@@ -81,10 +84,18 @@ export const ProjectController = new Elysia({
     params: t.Object({
         projectId: t.String()
     }),
-    response: t.Object({
-        status: t.String(),
-        message: t.String()
-    }).optional(),
+    response: {
+        204:  t.Object({
+            status: t.String(),
+            message: t.String()
+        }),
+        401: t.Object({
+            error: t.String(),
+        }),
+        500: t.Object({
+            error: t.String()
+    })
+},
     detail:{
         summary: "Delete a project",
         description: "Deletes a project by its ID."

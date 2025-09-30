@@ -1,0 +1,8 @@
+node_modules
+dist
+.migration
+.migrations
+coverage
+.docker
+.env
+.bun
