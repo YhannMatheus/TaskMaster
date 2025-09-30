@@ -1,9 +1,21 @@
 import { TaskSchema } from "../domain/task.schema";
-import { asc, desc, eq, and, gt } from "drizzle-orm";
+import { asc, eq} from "drizzle-orm";
 import { database } from "@/database/connection";
 import { UserSchema } from "@/database/index.schema";
 
-export type Task = typeof TaskSchema.$inferSelect;
+export interface Task {
+    id: string;
+    title: string | null;
+    description: string | null;
+    projectId: string;
+    columnId: string;
+    inChargeUserId: string | null;
+    status: 'pending' | 'in_progress' | 'completed' | 'on_hold' | 'cancelled';
+    priority: 'low' | 'medium' | 'high' | 'urgent' | null;
+    dueDate: Date | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+};
 
 export class TaskRepository {
     static async createTask(task: Task): Promise<Task> {
@@ -60,6 +72,15 @@ export class TaskRepository {
         return task;
     }
 
+    static async getTaskByTitle(title: string) {
+        const [task] = await database
+        .select()
+        .from(TaskSchema)
+        .where(eq(TaskSchema.title, title))
+        .limit(1);
+        return task;
+    }
+    
     static async deleteTask(taskId: string): Promise<void> {
         await database
         .delete(TaskSchema)

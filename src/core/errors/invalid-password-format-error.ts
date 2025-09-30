@@ -1,5 +1,5 @@
 export class InvalidPasswordFormatError extends Error {
   constructor() {
-    super("Invalid password format.");
+    super("Formato de senha inválido.");
   }
 }

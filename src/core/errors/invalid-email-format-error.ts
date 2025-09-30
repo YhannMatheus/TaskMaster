@@ -1,5 +1,5 @@
 export class InvalidEmailFormatError extends Error {
   constructor() {
-    super("Invalid email format.");
+    super("Formato de e-mail inválido.");
   }
 }

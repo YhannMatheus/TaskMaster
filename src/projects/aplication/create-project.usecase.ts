@@ -1,3 +1,4 @@
+import { InvalidProjectDataError } from "@/core/errors/invalid-project-data-error";
 import { ProjectRepository } from "../infraestructure/project.repository";
 
 export async function createProject(data: { 
@@ -6,16 +7,12 @@ export async function createProject(data: {
     teamId: string 
 }) {
     if(!data.name || !data.teamId) {
-        throw new Error("Name and TeamId are required");
+        throw new InvalidProjectDataError();
     }
     
-    if (data.description && typeof data.description !== 'string') {
-        throw new Error("Description must be a string");
-    }
-
     const project = await ProjectRepository.createProject({
         name: data.name,
-        description: data.description || null,
+        description: data.description,
         teamId: data.teamId,
     });
     

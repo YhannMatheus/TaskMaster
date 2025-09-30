@@ -1,5 +1,5 @@
 export class ProjectNotFoundError extends Error {
   constructor() {
-    super("Project not found.");
+    super("Projeto não encontrado.");
   }
 }

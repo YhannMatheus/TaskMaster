@@ -2,6 +2,7 @@ import {Elysia, t} from "elysia"
 import { ProjectRepository } from "./project.repository";
 import { authMiddleware, AuthenticatedUser } from "@/core/middleware/auth.middleware";
 import { createProject } from "../aplication/create-project.usecase";
+import { InvalidProjectDataError } from "@/core/errors/invalid-project-data-error";
 
 
 export const ProjectController = new Elysia({
@@ -19,7 +20,10 @@ export const ProjectController = new Elysia({
         return project;
 
     } catch (error) {
-        console.error('Erro ao criar projeto:', error);
+        if (error instanceof InvalidProjectDataError) {
+            set.status = 400;
+            return { error: error.message };
+        }
         set.status = 500;
         return { error: "Internal Server Error" };
     }
@@ -38,9 +42,16 @@ export const ProjectController = new Elysia({
             createdAt: t.Optional(t.String()),
             updatedAt: t.Optional(t.String()),
         }),
+        400: t.Object({
+            error: t.String()
+        }),
         500: t.Object({
             error: t.String()
         })
+    },
+    detail: {
+        summary: "Cria um novo projeto vazio",
+        description: "Cria um novo projeto com os detalhes fornecidos."
     }
 })
 

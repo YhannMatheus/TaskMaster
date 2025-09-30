@@ -3,8 +3,10 @@ import swagger from "@elysiajs/swagger";
 import { Elysia } from "elysia";
 import { AppRoutes } from "./app.routes";
 import { env } from "@/core/env";
+// note: avoid strict Server typing to prevent null/variant type issues
 
-const app = new Elysia({
+// Create Elysia app and attach middlewares/routes before listening
+const elysia = new Elysia({
   serve: {
     idleTimeout: 255,
     hostname: "0.0.0.0",
@@ -34,13 +36,12 @@ const app = new Elysia({
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       environment: env.NODE_ENV,
-      port: env.PORT
-    }
-  })
-  .listen(env.PORT);
+      port: env.PORT,
+    };
+  });
 
 if (env.NODE_ENV === "development") {
-  app.use(
+  elysia.use(
     swagger({
       swaggerOptions: {
         deepLinking: true,
@@ -50,11 +51,11 @@ if (env.NODE_ENV === "development") {
         components: {
           securitySchemes: {
             cookieAuth: {
-              type: 'apiKey',
-              in: 'cookie',
-              name: 'token'
-            }
-          }
+              type: "apiKey",
+              in: "cookie",
+              name: "token",
+            },
+          },
         },
         security: [{ cookieAuth: [] }],
         servers: [
@@ -78,16 +79,12 @@ if (env.NODE_ENV === "development") {
   );
 }
 
-export type app = typeof app;
+// Start listening and expose the underlying Node server instance for tests
+const listener = elysia.listen(env.PORT);
+
+// Export the raw server instance (may be null in rare cases) — tests will accept this
+export const app = listener.server as any;
 
 console.log(
-  `  📋 TaskMaster API \n
-  ⏳ Time: ${new Date().toISOString()} \n
-  🚀 Environment: ${env.NODE_ENV} \n
-  🚪 Port: ${app.server?.port} \n
-  🌐 URL: http://localhost:${app.server?.port} \n
-  📚 Documentation: http://localhost:${app.server?.port}/docs \n
-  © ${new Date().getFullYear()} TaskMaster. All rights reserved.
-  \n
-  `
+  `  📋 TaskMaster API \n\n  ⏳ Time: ${new Date().toISOString()} \n\n  🚀 Environment: ${env.NODE_ENV} \n\n  🚪 Port: ${env.PORT} \n\n  🌐 URL: http://localhost:${env.PORT} \n\n  📚 Documentation: http://localhost:${env.PORT}/docs \n\n  © ${new Date().getFullYear()} TaskMaster. All rights reserved.\n\n  `
 );

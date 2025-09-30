@@ -76,7 +76,7 @@ export const userRoutes = new Elysia({
     }
 })
 
-.post("/register", async ({body, set, cookie}) => {
+.post("/auth/register", async ({body, set, cookie}) => {
     try {
         const { user , token} = await userRegister({ ...body });
 
@@ -94,6 +94,7 @@ export const userRoutes = new Elysia({
         return {
             status: 201,
             user: { ...user },
+            token: token
         };
 
     } catch (error) {
@@ -128,7 +129,7 @@ export const userRoutes = new Elysia({
     response : {
         201: t.Object({
             status: t.Number(),
-            user: t.Omit(UserType, ['password']),
+            user: t.Omit(UserType, ['password', 'createdAt', 'updatedAt']),
             token: t.String()
         }),
         400: t.Object({
@@ -151,7 +152,7 @@ export const userRoutes = new Elysia({
     }
 })
 
-.get("/me", async (context: any) => {
+.get("/request/me", async (context: any) => {
     
     const user = await context.authenticated;
 

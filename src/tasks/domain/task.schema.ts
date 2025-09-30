@@ -16,7 +16,7 @@ export const TaskSchema = pgTable("tasks", {
     columnId: varchar("column_id").notNull().references(() => ColumSchema.id, { onDelete: "cascade" }),
     inChargeUserId: varchar("in_charge_user_id", { length: 255 }).references(() => UserSchema.id, { onDelete: "set null" }),
     status: StatusEnum("status").notNull().default("pending"),
-    priority: PriorityEnum("priority").notNull().default("medium"),
+    priority: PriorityEnum("priority").default("medium"),
     dueDate: timestamp("due_date"),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),

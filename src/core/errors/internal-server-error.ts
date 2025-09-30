@@ -1,5 +1,5 @@
 export class InternalServerError extends Error {
   constructor() {
-    super("Internal server error.");
+    super("Erro interno do servidor.");
   }
 }

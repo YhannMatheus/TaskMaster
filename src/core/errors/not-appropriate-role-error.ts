@@ -1,5 +1,5 @@
 export class NotAppropriateRoleError extends Error {
   constructor() {
-    super("User does not have the appropriate role.");
+    super("Usuário não possui a função apropriada.");
   }
 }

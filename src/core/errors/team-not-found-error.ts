@@ -1,5 +1,5 @@
 export class TeamNotFoundError extends Error {
   constructor() {
-    super("Team not found.");
+    super("Equipe não encontrada.");
   }
 }

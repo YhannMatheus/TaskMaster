@@ -1,5 +1,5 @@
 export class TeamAlreadyExistsError extends Error {
   constructor() {
-    super("Team already exists.");
+    super("Equipe já existe.");
   }
 }
