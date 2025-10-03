@@ -1,13 +1,10 @@
-import {Elysia, t} from "elysia"
-import { ProjectRepository } from "./project.repository";
-import { authMiddleware, AuthenticatedUser } from "@/core/middleware/auth.middleware";
-import { createProject } from "../aplication/create-project.usecase";
-import { InvalidProjectDataError } from "@/core/errors/invalid-project-data-error";
+import { Elysia, t } from "elysia";
+import { ColumnRepository } from "./column.repository";
+import { authMiddleware } from "@/core/middleware/auth.middleware";
 
-
-export const ProjectController = new Elysia({
-    prefix: "/api/projects",
-    tags: ["Projects"]
+export const ColumnController = new Elysia({
+    prefix: "/api/columns",
+    tags: ["Columns"]
 })
 .use(authMiddleware)
 .post("/", async (context: any) => {
@@ -19,85 +16,25 @@ export const ProjectController = new Elysia({
     }
 
     try {
-        const project = await createProject(body);
+        const column = await ColumnRepository.createColumn(body);
         set.status = 201;
-        return project;
+        return column;
     } catch (error) {
-        if (error instanceof InvalidProjectDataError) {
-            set.status = 400;
-            return { error: error.message };
-        }
         set.status = 500;
         return { error: "Erro interno do servidor" };
     }
 }, {
     body: t.Object({
         name: t.String(),
-        description: t.Optional(t.String()),
-        teamId: t.String()
+        projectId: t.String()
     }),
     response: {
         201: t.Object({
             id: t.String(),
             name: t.String(),
-            teamId: t.String(),
-            description: t.Optional(t.String()),
-            createdAt: t.Optional(t.String()),
-            updatedAt: t.Optional(t.String()),
-        }),
-        400: t.Object({
-            error: t.String()
-        }),
-        500: t.Object({
-            error: t.String()
-        })
-    },
-    detail: {
-        summary: "Cria um novo projeto vazio",
-        description: "Cria um novo projeto com os detalhes fornecidos."
-    }
-})
-
-.get("/", async (context: any) => {
-    const { authenticated, set, query } = context;
-
-    if (!authenticated) {
-        set.status = 401;
-        return { error: 'Não autorizado' };
-    }
-
-    try {
-        // Se há teamId na query, busca por team específico
-        if (query.teamId) {
-            const projects = await ProjectRepository.getProjectsByTeamId(query.teamId);
-            set.status = 200;
-            return { projects };
-        } else {
-            // Aqui você pode implementar busca geral ou por usuário
-            set.status = 400;
-            return { error: "teamId é obrigatório" };
-        }
-    } catch (error) {
-        set.status = 500;
-        return { error: "Erro interno do servidor" };
-    }
-}, {
-    query: t.Object({
-        teamId: t.Optional(t.String())
-    }),
-    response: {
-        200: t.Object({
-            projects: t.Array(t.Object({
-                id: t.String(),
-                name: t.String(),
-                teamId: t.String(),
-                description: t.Union([t.String(), t.Null()]),
-                createdAt: t.Union([t.Date(), t.Null()]),
-                updatedAt: t.Union([t.Date(), t.Null()]),
-            }))
-        }),
-        400: t.Object({
-            error: t.String()
+            projectId: t.String(),
+            createdAt: t.Union([t.Date(), t.Null()]),
+            updatedAt: t.Union([t.Date(), t.Null()]),
         }),
         401: t.Object({
             error: t.String()
@@ -107,8 +44,52 @@ export const ProjectController = new Elysia({
         })
     },
     detail: {
-        summary: "Lista projetos",
-        description: "Lista projetos de um team específico."
+        summary: "Criar coluna",
+        description: "Cria uma nova coluna em um projeto."
+    }
+})
+
+.get("/project/:projectId", async (context: any) => {
+    const { params, authenticated, set } = context;
+    const { projectId } = params;
+
+    if (!authenticated) {
+        set.status = 401;
+        return { error: 'Não autorizado' };
+    }
+
+    try {
+        const columns = await ColumnRepository.getColumnsByProjectId(projectId);
+        set.status = 200;
+        return { columns };
+    } catch (error) {
+        set.status = 500;
+        return { error: "Erro interno do servidor" };
+    }
+}, {
+    params: t.Object({
+        projectId: t.String()
+    }),
+    response: {
+        200: t.Object({
+            columns: t.Array(t.Object({
+                id: t.String(),
+                name: t.String(),
+                projectId: t.String(),
+                createdAt: t.Union([t.Date(), t.Null()]),
+                updatedAt: t.Union([t.Date(), t.Null()]),
+            }))
+        }),
+        401: t.Object({
+            error: t.String()
+        }),
+        500: t.Object({
+            error: t.String()
+        })
+    },
+    detail: {
+        summary: "Listar colunas do projeto",
+        description: "Lista todas as colunas de um projeto específico."
     }
 })
 
@@ -122,15 +103,15 @@ export const ProjectController = new Elysia({
     }
 
     try {
-        const project = await ProjectRepository.getProjectById(id);
+        const column = await ColumnRepository.getColumnById(id);
         
-        if (!project) {
+        if (!column) {
             set.status = 404;
-            return { error: "Projeto não encontrado" };
+            return { error: "Coluna não encontrada" };
         }
         
         set.status = 200;
-        return project;
+        return column;
     } catch (error) {
         set.status = 500;
         return { error: "Erro interno do servidor" };
@@ -143,8 +124,7 @@ export const ProjectController = new Elysia({
         200: t.Object({
             id: t.String(),
             name: t.String(),
-            teamId: t.String(),
-            description: t.Union([t.String(), t.Null()]),
+            projectId: t.String(),
             createdAt: t.Union([t.Date(), t.Null()]),
             updatedAt: t.Union([t.Date(), t.Null()]),
         }),
@@ -159,8 +139,8 @@ export const ProjectController = new Elysia({
         })
     },
     detail: {
-        summary: "Obter projeto por ID",
-        description: "Busca um projeto específico pelo seu ID."
+        summary: "Obter coluna por ID",
+        description: "Busca uma coluna específica pelo seu ID."
     }
 })
 
@@ -174,15 +154,15 @@ export const ProjectController = new Elysia({
     }
 
     try {
-        const project = await ProjectRepository.updateProject(id, body);
+        const column = await ColumnRepository.updateColumn(id, body);
         
-        if (!project) {
+        if (!column) {
             set.status = 404;
-            return { error: "Projeto não encontrado" };
+            return { error: "Coluna não encontrada" };
         }
         
         set.status = 200;
-        return project;
+        return column;
     } catch (error) {
         set.status = 500;
         return { error: "Erro interno do servidor" };
@@ -193,14 +173,12 @@ export const ProjectController = new Elysia({
     }),
     body: t.Object({
         name: t.Optional(t.String()),
-        description: t.Optional(t.String()),
     }),
     response: {
         200: t.Object({
             id: t.String(),
             name: t.String(),
-            teamId: t.String(),
-            description: t.Union([t.String(), t.Null()]),
+            projectId: t.String(),
             createdAt: t.Union([t.Date(), t.Null()]),
             updatedAt: t.Union([t.Date(), t.Null()]),
         }),
@@ -215,51 +193,49 @@ export const ProjectController = new Elysia({
         })
     },
     detail: {
-        summary: "Atualizar projeto",
-        description: "Atualiza um projeto existente."
+        summary: "Atualizar coluna",
+        description: "Atualiza uma coluna existente."
     }
 })
 
-.delete("/:projectId", async (context: any) => {
+.delete("/:id", async (context: any) => {
     const { params, authenticated, set } = context;
-    const user = authenticated as AuthenticatedUser;
-    const { projectId } = params;
+    const { id } = params;
 
-    if (user.userId != null) {
-        try {
-            await ProjectRepository.deleteProject(projectId);
-            set.status = 204;
-            return{
-                status: "204",
-                message: "Project deleted successfully"
-            };
-
-        } catch (error) {
-            set.status = 500;
-            return { error: "Internal Server Error" };
-        }
-    } else {
+    if (!authenticated) {
         set.status = 401;
-        return { error: "Unauthorized" };
+        return { error: 'Não autorizado' };
     }
-},{
+
+    try {
+        await ColumnRepository.deleteColumn(id);
+        set.status = 204;
+        return {
+            status: "204",
+            message: "Coluna deletada com sucesso"
+        };
+    } catch (error) {
+        set.status = 500;
+        return { error: "Erro interno do servidor" };
+    }
+}, {
     params: t.Object({
-        projectId: t.String()
+        id: t.String()
     }),
     response: {
-        204:  t.Object({
+        204: t.Object({
             status: t.String(),
             message: t.String()
         }),
         401: t.Object({
-            error: t.String(),
+            error: t.String()
         }),
         500: t.Object({
             error: t.String()
-    })
-},
-    detail:{
-        summary: "Delete a project",
-        description: "Deletes a project by its ID."
+        })
+    },
+    detail: {
+        summary: "Deletar coluna",
+        description: "Deleta uma coluna pelo seu ID."
     }
-})
+});

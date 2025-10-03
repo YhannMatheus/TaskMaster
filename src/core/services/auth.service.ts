@@ -5,6 +5,7 @@ import type { SignOptions, JwtPayload } from 'jsonwebtoken';
 interface TokenPayload extends JwtPayload {
     userId: string;
     email: string;
+    role: 'USER' | 'SUPPORT';
 }
 
 export class AuthService {

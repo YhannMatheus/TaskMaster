@@ -6,7 +6,7 @@ EmailAlreadyUsedError,
 PasswordDoNotMatchError 
 } from "@/core/errors/index.error";
 import { AuthService, CryptService, ValidatorsService } from "@/core/services/index.service";
-import { SessionRepository } from "@/session/infraestructure/session.repository";
+// import { SessionRepository } from "@/session/infraestructure/session.repository";
 
 interface RegisterResponse {
     firstName: string;
@@ -14,7 +14,7 @@ interface RegisterResponse {
     email: string;
     password:string;
     confirmationPassword: string;
-    instituition?: "UFPA" | "UEPA" | "IFPA" | "CESUPA" | "UNAMA" | "FIBRA" | "ESTACIO" | "OUTRO" | "NENHUMA";
+    institution?: "UFPA" | "UEPA" | "IFPA" | "CESUPA" | "UNAMA" | "FIBRA" | "ESTACIO" | "OUTRO" | "NENHUMA";
 }
 
 export const userRegister = async(register: RegisterResponse) => {
@@ -43,19 +43,20 @@ export const userRegister = async(register: RegisterResponse) => {
         lastName: register.lastName,
         email: register.email.toLocaleLowerCase(),
         password: hashedPassword,
-        instituition: register.instituition || "NENHUMA",
+        institution: register.institution || "NENHUMA",
         role: 'USER',
 
     });
 
-    const token = AuthService.generateToken({ userId: newUser.id, email: newUser.email});
+    const token = AuthService.generateToken({ userId: newUser.id, email: newUser.email, role: newUser.role});
     
-    await SessionRepository.createSession({
-        email: newUser.email,
-        token: token,
-        type: "email_verification",
-        expiresAt: new Date(Date.now() + 7*24*60*60*1000)
-    });
+    // Temporariamente comentado para depuração
+    // await SessionRepository.createSession({
+    //     email: newUser.email,
+    //     token: token,
+    //     type: "email_verification",
+    //     expiresAt: new Date(Date.now() + 7*24*60*60*1000)
+    // });
 
     return { user: newUser, token: token };
 }

@@ -11,17 +11,15 @@ import {
     UnauthorizedError
 } from '@/core/errors/index.error';
 import { userProfile } from '../application/profile.usecase';
-import { authMiddleware } from '@/core/middleware/auth.middleware';
 import { env } from '@/core/env';
 
 //TODO: Inicio dos controllers de usuário
 export const userRoutes = new Elysia({
-    prefix: "/users",
+    prefix: "/api/users",
     tags: ["Users"]
 })
-.use(authMiddleware)
 .use(cookie())
-.post("/auth/login", async ({body, set, cookie}) => {
+.post("/login", async ({body, set, cookie}) => {
     try{
         
         const userLoginData = await userLogin(body.email, body.password, body.rememberMe || false)
@@ -76,7 +74,7 @@ export const userRoutes = new Elysia({
     }
 })
 
-.post("/auth/register", async ({body, set, cookie}) => {
+.post("/register", async ({body, set, cookie}) => {
     try {
         const { user , token} = await userRegister({ ...body });
 
@@ -98,6 +96,8 @@ export const userRoutes = new Elysia({
         };
 
     } catch (error) {
+        console.error('Erro no registro de usuário:', error);
+        
         if( error instanceof InvalidPasswordFormatError) {
             set.status = 400;
             return { error: error.message };
@@ -123,7 +123,7 @@ export const userRoutes = new Elysia({
         email: t.String(),
         password: t.String(),
         confirmationPassword: t.String(),
-        instituition: t.Optional(t.UnionEnum(["UFPA", "UEPA", "IFPA", "CESUPA", "UNAMA", "FIBRA", "ESTACIO", "OUTRO", "NENHUMA"])),
+        institution: t.Optional(t.UnionEnum(["UFPA", "UEPA", "IFPA", "CESUPA", "UNAMA", "FIBRA", "ESTACIO", "OUTRO", "NENHUMA"])),
         role: t.Optional(t.UnionEnum(["USER", "SUPPORT"]))
     }),
     response : {
@@ -152,46 +152,88 @@ export const userRoutes = new Elysia({
     }
 })
 
-.get("/request/me", async (context: any) => {
+.get("/profile", async (context: any) => {
     
-    const user = await context.authenticated;
-
-    if(user){
+    console.log('=== PROFILE ENDPOINT CALLED ===');
+    console.log('Available properties in context:', Object.keys(context));
+    console.log('Store contents:', context.store);
+    console.log('Headers:', context.headers);
+    console.log('Authorization header:', context.headers?.authorization);
+    
+    // Manual auth check - temporary fix
+    const authHeader = context.headers?.authorization;
+    let authenticated = null;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        console.log('🎫 Manual token extraction:', token.substring(0, 20) + '...');
+        
         try {
-           
-            const profile = await userProfile(user.userId);
-             
-            if (!profile) {
-                context.set.status = 404;
-                return {
-                    status: "404",
-                    error: "User not found"
+            const { AuthService } = await import('@/core/services/auth.service');
+            const decoded = AuthService.verifyToken(token);
+            console.log('🔓 Manual decoded:', decoded);
+            
+            if (decoded) {
+                authenticated = {
+                    userId: decoded.userId,
+                    email: decoded.email,
+                    role: decoded.role || 'USER'
                 };
+                console.log('✅ Manual auth success:', authenticated);
             }
-            
-            context.set.status = 200;
-            return { user: profile };
-            
         } catch (error) {
-            if (error instanceof UnauthorizedError) {
-                context.set.status = 401;
+            console.log('❌ Manual auth error:', error);
+        }
+    }
+    
+    try {
+        const user = context.store.authenticated || authenticated;
+        console.log('User from store or manual:', user);
+
+        if(user){
+            try {
+               
+                const profile = await userProfile(user.userId);
+                 
+                if (!profile) {
+                    context.set.status = 404;
+                    return {
+                        status: "404",
+                        error: "User not found"
+                    };
+                }
+                
+                context.set.status = 200;
+                return { user: profile };
+                
+            } catch (error) {
+                if (error instanceof UnauthorizedError) {
+                    context.set.status = 401;
+                    return {
+                        status: "401",
+                        error: "Unauthorized"
+                    };
+                }
+                
+                context.set.status = 500;
                 return {
-                    status: "401",
-                    error: "Unauthorized"
+                    status: "500",
+                    error: "Internal server error"
                 };
             }
-            
-            context.set.status = 500;
+        } else {
+            context.set.status = 401;
             return {
-                status: "500",
-                error: "Internal server error"
+                status: "401", 
+                error: "Unauthorized" 
             };
         }
-    } else {
+    } catch (error) {
+        console.log('Error getting authenticated user:', error);
         context.set.status = 401;
         return {
             status: "401", 
-            error: "Unauthorized" 
+            error: "Authentication failed" 
         };
     }
 }, {
@@ -203,7 +245,7 @@ export const userRoutes = new Elysia({
                 lastName: t.Union([t.String(), t.Null()]),
                 email: t.String(),
                 role: t.Union([t.Literal('USER'), t.Literal('SUPPORT')]),
-                instituition: t.Union([
+                institution: t.Union([
                     t.Literal('UFPA'),
                     t.Literal('UEPA'),
                     t.Literal('IFPA'),

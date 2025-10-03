@@ -3,13 +3,6 @@
   "dialect": "postgresql",
   "entries": [
     {
-      "idx": 0,
-      "version": "7",
-      "when": 1758060189650,
-      "tag": "0000_thick_ogun",
-      "breakpoints": true
-    },
-    {
       "idx": 1,
       "version": "7",
       "when": 1758209088581,

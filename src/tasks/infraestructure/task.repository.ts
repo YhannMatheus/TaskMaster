@@ -82,6 +82,16 @@ export class TaskRepository {
         return tasks;
     }
 
+    static async getTasksByColumnId(columnId: string): Promise<Task[]> {
+        const tasks = await database
+        .select()
+        .from(TaskSchema)
+        .where(eq(TaskSchema.columnId, columnId))
+        .orderBy(asc(TaskSchema.createdAt));
+        
+        return tasks;
+    }
+
     static async getTaskById(taskId: string) {
         const [task] = await database
         .select()

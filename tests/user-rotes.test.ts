@@ -17,7 +17,7 @@ describe('Teste de rotas de usuário', () => {
         // confirmationPassword is required by the register schema
         user['confirmationPassword'] = user.password;
         const response = await request(`http://localhost:${env.PORT}`)
-            .post('/users/auth/register')
+            .post('/api/users/register')
             .send(user);
         expect(response.status).toBe(201);
         expect(response.body).toHaveProperty('token');
@@ -34,24 +34,30 @@ describe('Teste de rotas de usuário', () => {
         user['confirmationPassword'] = user.password;
         
         const response = await request(`http://localhost:${env.PORT}`)
-            .post('/users/auth/register')
+            .post('/api/users/register')
             .send(user);
         expect(response.status).toBe(409);
         expect(response.body).toHaveProperty('error', 'Email já está em uso.');
     });
 
-    it("Login para um usuário existente", async () => {
+    it("Deve abrir o perfil do usuário autenticado", async () => {
         const credentials = {
             email: uniqueEmail,
-            password: "Password123!"
+            password: "Password123!",
+            rememberMe: true
         };
-        const response = await request(`http://localhost:${env.PORT}`)
-            .post('/users/auth/login')
+        const loginResponse = await request(`http://localhost:${env.PORT}`)
+            .post('/api/users/login')
             .send(credentials);
-        expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty('token');
-        expect(response.body).toHaveProperty('user');
-        expect(response.body.user).not.toHaveProperty('password');
-        expect(response.body.user).toHaveProperty('email', credentials.email);
+        
+        expect(loginResponse.status).toBe(200);
+        const token = loginResponse.body.token;
+
+        const profileResponse = await request(`http://localhost:${env.PORT}`)
+            .get('/api/users/profile')
+            .set('Authorization', `Bearer ${token}`);
+        expect(profileResponse.status).toBe(200);
+        expect(profileResponse.body.user).toHaveProperty('email', credentials.email);
+        expect(profileResponse.body.user).not.toHaveProperty('password');
     });
 });

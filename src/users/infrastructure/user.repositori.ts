@@ -11,7 +11,7 @@ interface UserData{
     firstName: string;
     lastName?: string;
     role?: 'USER' | 'SUPPORT';
-    instituition: "UFPA" | "UEPA" | "IFPA" | "CESUPA" | "UNAMA" | "FIBRA" | "ESTACIO" | "OUTRO" | "NENHUMA";
+    institution: "UFPA" | "UEPA" | "IFPA" | "CESUPA" | "UNAMA" | "FIBRA" | "ESTACIO" | "OUTRO" | "NENHUMA";
     createdAt?: Date;
     updatedAt?: Date;
 
@@ -77,7 +77,7 @@ export class UserRepository {
             lastName: UserSchema.lastName,
             email: UserSchema.email,
             role: UserSchema.role,
-            instituition: UserSchema.instituition,
+            institution: UserSchema.institution,
             createdAt: UserSchema.createdAt,
             updatedAt: UserSchema.updatedAt
         })

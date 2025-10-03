@@ -1,5 +1,8 @@
 {
   "out": "./migrations",
   "schema": "./src/database/index.schema.ts",
-  "dialect": "postgresql"
+  "dialect": "postgresql",
+  "dbCredentials": {
+    "url": "postgresql://poraygua:kambam@localhost:5432/kambamdb"
+  }
 }

@@ -26,7 +26,7 @@ export const UserSchema = pgTable("users", {
     email: varchar("email", {length: 255}).notNull().unique(),
     password: varchar("password", {length: 255}).notNull(),
     role: RoleEnum('role').default('USER').notNull(),
-    instituition: InstitutionEnum('institution').default('NENHUMA'),
+    institution: InstitutionEnum('institution').default('NENHUMA'),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow().$default(() => new Date()),
     verificationDate: timestamp("verification_date"),

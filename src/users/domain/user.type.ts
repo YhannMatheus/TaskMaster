@@ -7,7 +7,7 @@ export const UserType = t.Object({
     email: t.String(),
     password: t.String(),
     role: t.UnionEnum(["USER", "SUPPORT"]),
-    instituition: t.Nullable(t.UnionEnum(["UFPA", "UEPA", "IFPA", "CESUPA", "UNAMA", "FIBRA", "ESTACIO", "OUTRO", "NENHUMA"])),
+    institution: t.Nullable(t.UnionEnum(["UFPA", "UEPA", "IFPA", "CESUPA", "UNAMA", "FIBRA", "ESTACIO", "OUTRO", "NENHUMA"])),
     createdAt: t.Nullable(t.Date()),
     updatedAt: t.Nullable(t.Date()),
 })
@@ -19,7 +19,7 @@ export const UserProfileResponseType = t.Object({
         lastName: t.Union([t.String(), t.Null()]),
         email: t.String(),
         role: t.Union([t.Literal("USER"), t.Literal("SUPPORT")]),
-        instituition: t.Union([
+        institution: t.Union([
             t.Literal("UFPA"), t.Literal("UEPA"), t.Literal("IFPA"),
             t.Literal("CESUPA"), t.Literal("UNAMA"), t.Literal("FIBRA"),
             t.Literal("ESTACIO"), t.Literal("OUTRO"), t.Literal("NENHUMA"),
